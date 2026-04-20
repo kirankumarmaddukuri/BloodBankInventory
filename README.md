@@ -36,9 +36,8 @@
 
 ## 🩸 Overview
 
-FlowSync is a real-time Blood Bank Inventory and Emergency Donor Matching System designed to bridge the critical gap between blood donors, blood banks, and hospitals. The system enforces strict medical business rules (donation intervals, hemoglobin thresholds, compatibility matrices) and provides role-specific dashboards for all stakeholders.
+It is a real-time Blood Bank Inventory and Emergency Donor Matching System designed to bridge the critical gap between blood donors, blood banks, and hospitals. The system enforces strict medical business rules (donation intervals, hemoglobin thresholds, compatibility matrices) and provides role-specific dashboards for all stakeholders.
 
-Built during a 48-hour Hackathon, the system demonstrates end-to-end blood unit lifecycle management — from donor registration to hospital fulfillment.
 
 ---
 
