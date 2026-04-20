@@ -1,4 +1,4 @@
-# FlowSync — Blood Bank Inventory & Emergency Donor Matching System
+# Blood Bank Inventory & Emergency Donor Matching System
 
 <div align="center">
 

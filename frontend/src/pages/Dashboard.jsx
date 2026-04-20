@@ -744,7 +744,7 @@ const Dashboard = () => {
              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-orange-500 flex items-center justify-center shadow-lg shadow-primary/20">
                 <Droplet size={18} className="text-white" />
              </div>
-             <span className="font-bold text-xl text-white tracking-wide">Flow<span className="text-primary">Sync</span></span>
+             <span className="font-bold text-xl text-white tracking-wide">Blood<span className="text-primary">Bank</span></span>
           </div>
           
           <div className="flex items-center gap-6">
