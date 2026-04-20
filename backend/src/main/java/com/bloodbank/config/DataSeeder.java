@@ -248,6 +248,21 @@ public class DataSeeder implements CommandLineRunner {
                 .transactionType(TransactionType.REQUEST_FULFILLMENT)
                 .referenceId(req4.getId()).build());
 
+        // ─────────────────────────────────────────────────────────────────
+        // 10. DONATION APPOINTMENTS
+        // ─────────────────────────────────────────────────────────────────
+        appointmentRepository.save(DonationAppointment.builder()
+                .donor(donor1).appointmentDate(LocalDateTime.now().plusDays(3))
+                .status(AppointmentStatus.SCHEDULED).notes("Morning slot preferred, John Doe O-").build());
+
+        appointmentRepository.save(DonationAppointment.builder()
+                .donor(donor2).appointmentDate(LocalDateTime.now().plusDays(7).plusHours(2))
+                .status(AppointmentStatus.SCHEDULED).notes("After 10AM, Ananya A+").build());
+
+        appointmentRepository.save(DonationAppointment.builder()
+                .donor(donor3).appointmentDate(LocalDateTime.now().minusMonths(3))
+                .status(AppointmentStatus.COMPLETED).notes("Whole blood collection, no complications.").build());
+
         System.out.println(" ALL TABLES SEEDED SUCCESSFULLY! READY FOR DEMO! ");
         System.out.println("  admin@gmail.com       / admin123");
         System.out.println("  manager@gmail.com     / manager123");

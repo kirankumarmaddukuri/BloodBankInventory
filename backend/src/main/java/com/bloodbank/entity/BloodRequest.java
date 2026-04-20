@@ -5,6 +5,7 @@ import com.bloodbank.entity.enums.ComponentType;
 import com.bloodbank.entity.enums.RequestPriority;
 import com.bloodbank.entity.enums.RequestStatus;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -53,8 +54,9 @@ public class BloodRequest {
 
     private LocalDateTime fulfilledAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fulfilled_by_user_id")
+    @JsonIgnoreProperties({"password", "phone", "dateOfBirth", "createdAt"})
     private User fulfilledBy;
 
 }

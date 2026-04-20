@@ -75,16 +75,18 @@ const Dashboard = () => {
   
   // Dashboard Metrics state
   const [expiringCount, setExpiringCount] = useState(0);
+  const [allAppointments, setAllAppointments] = useState([]);
 
   useEffect(() => {
     if (user?.role === 'BLOOD_BANK_ADMIN' || user?.role === 'ADMIN') {
       api.get('/blood-units/inventory').then(res => setInventory(res.data)).catch(console.error);
       api.get('/blood-units/testing').then(res => setTestingUnits(res.data)).catch(console.error);
-      api.get('/blood-requests').then(res => setBloodRequests(res.data)).catch(console.error);
+      api.get('/blood-requests').then(res => { console.log('Admin Blood Requests:', res.data); setBloodRequests(res.data); }).catch(console.error);
       api.get('/blood-units/expiring').then(res => setExpiringCount(res.data.length)).catch(console.error);
+      api.get('/appointments').then(res => setAllAppointments(res.data)).catch(console.error);
     }
     if (user?.role === 'HOSPITAL_STAFF') {
-      api.get('/blood-requests').then(res => setMyRequests(res.data)).catch(console.error);
+      api.get('/blood-requests').then(res => { console.log('Hospital My Requests:', res.data); setMyRequests(res.data); }).catch(console.error);
       api.get('/blood-units/inventory').then(res => setPubInventory(res.data)).catch(console.error);
     }
     if (user?.role === 'EMERGENCY_COORDINATOR') {
@@ -174,7 +176,7 @@ const Dashboard = () => {
         priority: reqPriority
     }).then(res => {
         alert('Request #' + res.data.id + ' successfully transmitted to the regional bank!');
-        setReqPatient('');
+        window.location.reload();
     }).catch(err => alert("Failed: " + JSON.stringify(err.response?.data)));
   };
 
@@ -190,7 +192,7 @@ const Dashboard = () => {
         reactionRemarks: transRemarks
     }).then(res => {
         alert('Transfusion securely recorded! Tracking ID: ' + res.data.id);
-        setTransUnitId(''); setTransReqId(''); setTransRemarks(''); setTransAdverse(false);
+        window.location.reload();
     }).catch(err => alert("Failed: " + (err.response?.data?.message || JSON.stringify(err.response?.data))));
   };
 
@@ -398,9 +400,47 @@ const Dashboard = () => {
                         <option value="PERMANENTLY_DEFERRED">Permanently Deferred</option>
                      </select>
                      <button onClick={handleUpdateEligibility} className="w-full bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-bold transition-all shadow-lg">
-                       Submit Override
+                       Update Global Status
                      </button>
+                </div>
+
+                {/* Upcoming Appointments List */}
+                <div className="bg-[#242436] rounded-xl p-6 border border-gray-700/50 shadow-md col-span-1 lg:col-span-2">
+                   <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-white font-bold text-xl flex items-center gap-2"><Droplet className="text-blue-400"/> Upcoming Donor Schedule</h3>
+                      <button onClick={() => api.get('/appointments').then(res => setAllAppointments(res.data))} className="text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 px-3 py-1 border border-blue-500/30 rounded-lg transition-all font-bold">
+                        ↻ Refresh Live
+                      </button>
                    </div>
+                   <div className="overflow-x-auto">
+                     <table className="w-full text-left text-gray-300 text-sm">
+                        <thead className="bg-[#1A1A2E] text-gray-400 uppercase text-[10px] font-bold">
+                           <tr>
+                              <th className="px-4 py-2">Date</th>
+                              <th className="px-4 py-2">Donor</th>
+                              <th className="px-4 py-2">Blood Group</th>
+                              <th className="px-4 py-2">Notes</th>
+                              <th className="px-4 py-2">Status</th>
+                           </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-800">
+                           {allAppointments.length === 0 ? (
+                             <tr><td colSpan="5" className="p-4 italic text-center">No upcoming appointments scheduled.</td></tr>
+                           ) : (
+                             allAppointments.map(appt => (
+                               <tr key={appt.id} className="hover:bg-white/5">
+                                 <td className="px-4 py-3 font-semibold">{new Date(appt.appointmentDate).toLocaleDateString()}</td>
+                                 <td className="px-4 py-3 text-white">{appt.donor?.user?.name}</td>
+                                 <td className="px-4 py-3"><span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-xs font-bold">{appt.donor?.bloodGroup?.replace('_POS','+').replace('_NEG','-')}</span></td>
+                                 <td className="px-4 py-3 max-w-[200px] truncate">{appt.notes || '—'}</td>
+                                 <td className="px-4 py-3"><span className="text-available text-[10px] font-bold uppercase tracking-wider">{appt.status}</span></td>
+                               </tr>
+                             ))
+                           )}
+                        </tbody>
+                     </table>
+                   </div>
+                </div>
                 </div>
 
                 {/* Testing Lab Panel */}
@@ -434,8 +474,14 @@ const Dashboard = () => {
 
                 {/* Hospital Requests Panel */}
                 <div className="bg-[#1A1A2E] rounded-xl p-6 border border-gray-700/50 shadow-inner col-span-1 lg:col-span-2 mt-4">
-                   <h3 className="text-white font-bold text-xl mb-4 flex items-center gap-2"><Activity className="text-purple-400"/> Hospital Requests Command</h3>
+                   <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-white font-bold text-xl flex items-center gap-2"><Activity className="text-purple-400"/> Hospital Requests Command</h3>
+                      <button onClick={() => { console.log("Syncing requests..."); api.get('/blood-requests').then(res => setBloodRequests(res.data)); }} className="text-xs bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 px-3 py-1 border border-purple-500/30 rounded-lg transition-all font-bold">
+                        ↻ Sync Requests
+                      </button>
+                   </div>
                    <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+                     <p className="text-[10px] text-gray-500 mb-1 uppercase tracking-widest font-bold">Loaded: {bloodRequests.length} records</p>
                      {bloodRequests.length === 0 ? (
                         <p className="text-gray-400 text-sm italic">No requisitions currently tracked on the grid.</p>
                      ) : (
@@ -652,6 +698,7 @@ const Dashboard = () => {
             {/* My Requests Tracker */}
             <div className="col-span-full bg-[#1A1A2E] rounded-xl p-6 border border-gray-700/50 shadow-inner">
                <h3 className="text-white font-bold text-xl mb-4 flex items-center gap-2"><Activity className="text-urgent"/> My Requisition Tracker</h3>
+               <p className="text-[10px] text-gray-500 mb-2 uppercase tracking-widest font-bold">Tracked Total: {myRequests.length}</p>
                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                  {myRequests.length === 0 ? <p className="text-gray-400 italic text-sm">No requisitions submitted yet.</p> : myRequests.map(req => (
                    <div key={req.id} className="bg-[#242436] p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center border border-gray-700/50 gap-2">

@@ -49,8 +49,11 @@ public class BloodRequestController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<BloodRequest>> getAllRequests() {
-        return ResponseEntity.ok(bloodRequestRepository.findAll());
+        List<BloodRequest> requests = bloodRequestRepository.findAll();
+        System.out.println("✅ FETCHING ALL REQUESTS. COUNT: " + requests.size());
+        return ResponseEntity.ok(requests);
     }
 
     @GetMapping("/pending")

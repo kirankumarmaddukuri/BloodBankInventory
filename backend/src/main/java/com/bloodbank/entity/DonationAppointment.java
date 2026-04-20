@@ -20,9 +20,8 @@ public class DonationAppointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "donor_id", nullable = false)
-    @JsonIgnore
     private Donor donor;
 
     @Column(nullable = false)

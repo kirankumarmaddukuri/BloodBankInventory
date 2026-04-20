@@ -51,4 +51,10 @@ public class AppointmentController {
                 .orElseThrow(() -> new RuntimeException("Donor profile not found"));
         return ResponseEntity.ok(appointmentRepository.findByDonorId(donor.getId()));
     }
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'BLOOD_BANK_ADMIN')")
+    public ResponseEntity<List<DonationAppointment>> getAllAppointments() {
+        return ResponseEntity.ok(appointmentRepository.findAll());
+    }
 }
